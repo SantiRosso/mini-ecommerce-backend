@@ -18,4 +18,4 @@ import { UserController } from './presentation/controllers/user.controller';
   ],
   exports: [UserService],
 })
-export class UsersModule {}
+export class UserModule {}
