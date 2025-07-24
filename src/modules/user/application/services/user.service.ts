@@ -1,4 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
+import * as bcrypt from 'bcryptjs';
 import { User } from '../../domain/entities/user.entity';
 import { UserRepository } from '../../domain/repositories/user.repository';
 import { USER_REPOSITORY_TOKEN } from '../../domain/repositories/user.repository.token';
@@ -33,7 +34,14 @@ export class UserService {
       throw new Error('User with this email already exists');
     }
 
-    const user = User.create(createUserDto.email, createUserDto.name);
+    // Hash de la contraseña
+    const hashedPassword = await bcrypt.hash(createUserDto.password, 12);
+
+    const user = User.create(
+      createUserDto.email,
+      createUserDto.name,
+      hashedPassword,
+    );
     return this.userRepository.create(user);
   }
 

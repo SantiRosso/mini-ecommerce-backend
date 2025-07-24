@@ -9,4 +9,9 @@ export class CreateUserDto {
   @IsNotEmpty()
   @MinLength(2)
   name: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @MinLength(6)
+  password: string;
 }
