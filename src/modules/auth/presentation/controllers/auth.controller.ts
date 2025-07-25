@@ -13,6 +13,8 @@ import { AuthService } from '../../application/services/auth.service';
 import { LoginDto } from '../../application/dtos/login.dto';
 import { RegisterDto } from '../../application/dtos/register.dto';
 import { JwtAuthGuard } from '../../infrastructure/guards/jwt-auth.guard';
+import { User } from '../../infrastructure/decorators/user.decorator';
+import { PublicUserDto } from '../../application/dtos/public-user.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -50,9 +52,15 @@ export class AuthController {
     }
   }
 
-  @Get('profile')
+  // @Get('profile')
+  // @UseGuards(JwtAuthGuard)
+  // getProfile(@Request() req: { user: any }): any {
+  //   return req.user;
+  // }
+
   @UseGuards(JwtAuthGuard)
-  getProfile(@Request() req: { user: any }): any {
-    return req.user;
+  @Get('me')
+  getMe(@User() user: PublicUserDto) {
+    return user;
   }
 }
