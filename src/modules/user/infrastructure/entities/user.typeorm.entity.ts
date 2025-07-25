@@ -20,6 +20,9 @@ export class UserEntity {
   @Column({ select: false }) // No incluir password por defecto en las consultas
   password: string;
 
+  @Column({ nullable: true, select: false })
+  refreshToken?: string;
+
   @CreateDateColumn()
   createdAt: Date;
 

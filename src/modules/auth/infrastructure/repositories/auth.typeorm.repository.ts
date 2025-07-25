@@ -44,6 +44,7 @@ export class AuthTypeOrmRepository implements AuthRepository {
       undefined, // No incluir password por defecto
       userEntity.createdAt,
       userEntity.updatedAt,
+      userEntity.refreshToken,
     );
   }
 
@@ -55,6 +56,7 @@ export class AuthTypeOrmRepository implements AuthRepository {
       userEntity.password,
       userEntity.createdAt,
       userEntity.updatedAt,
+      userEntity.refreshToken,
     );
   }
 
@@ -63,9 +65,29 @@ export class AuthTypeOrmRepository implements AuthRepository {
     entity.id = user.id;
     entity.email = user.email;
     entity.name = user.name;
-    entity.password = user.password || '';
+    if (!user.password) {
+      throw new Error('Password is required when creating a user entity');
+    }
+    entity.password = user.password;
+    entity.refreshToken = user.refreshToken;
     entity.createdAt = user.createdAt || new Date();
     entity.updatedAt = user.updatedAt || new Date();
     return entity;
+  }
+
+  async saveRefreshToken(userId: string, refreshToken: string): Promise<void> {
+    await this.userRepository.update(userId, { refreshToken });
+  }
+
+  async isRefreshTokenValid(
+    userId: string,
+    refreshToken: string,
+  ): Promise<boolean> {
+    const userEntity = await this.userRepository.findOne({
+      where: { id: userId },
+      select: ['id', 'refreshToken'],
+    });
+
+    return userEntity?.refreshToken === refreshToken;
   }
 }

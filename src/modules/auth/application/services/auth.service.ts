@@ -1,4 +1,5 @@
 import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
 import { User } from '../../../user/domain/entities/user.entity';
@@ -13,11 +14,12 @@ export class AuthService {
     @Inject(AUTH_REPOSITORY_TOKEN)
     private readonly authRepository: AuthRepository,
     private readonly jwtService: JwtService,
+    private readonly configService: ConfigService,
   ) {}
 
   async register(
     registerDto: RegisterDto,
-  ): Promise<{ user: any; token: string }> {
+  ): Promise<{ user: any; accesshToken: string; refreshToken: string }> {
     // Verificar si el usuario ya existe
     const existingUser = await this.authRepository.findUserByEmail(
       registerDto.email,
@@ -38,15 +40,21 @@ export class AuthService {
     const savedUser = await this.authRepository.createUser(user);
 
     // Generar token
-    const token = this.generateToken(savedUser);
+    const accesshToken = this.generateAccessToken(savedUser);
+    const refreshToken = this.generateRefreshToken(savedUser);
+
+    await this.authRepository.saveRefreshToken(savedUser.id, refreshToken);
 
     return {
       user: savedUser.toPublic(),
-      token,
+      accesshToken,
+      refreshToken,
     };
   }
 
-  async login(loginDto: LoginDto): Promise<{ user: any; token: string }> {
+  async login(
+    loginDto: LoginDto,
+  ): Promise<{ user: any; accessToken: string; refreshToken: string }> {
     // Buscar usuario con contraseña
     const user = await this.authRepository.findUserByEmailWithPassword(
       loginDto.email,
@@ -65,11 +73,13 @@ export class AuthService {
     }
 
     // Generar token
-    const token = this.generateToken(user);
+    const accessToken = this.generateAccessToken(user);
+    const refreshToken = this.generateRefreshToken(user);
 
     return {
       user: user.toPublic(),
-      token,
+      accessToken,
+      refreshToken,
     };
   }
 
@@ -77,13 +87,49 @@ export class AuthService {
     return this.authRepository.findUserById(userId);
   }
 
-  private generateToken(user: User): string {
-    const payload = {
-      sub: user.id,
-      email: user.email,
-      name: user.name,
-    };
+  async refreshToken(refreshToken: string): Promise<{ accessToken: string }> {
+    try {
+      // interface JwtPayload {
+      //   sub: string;
+      //   iat?: number;
+      //   exp?: number;
+      // }
 
-    return this.jwtService.sign(payload);
+      const payload = this.jwtService.verify(refreshToken, {
+        secret: this.configService.get<string>('REFRESH_TOKEN_SECRET'),
+      });
+
+      const user = await this.authRepository.findUserById(payload.sub);
+
+      if (
+        !user ||
+        !(await this.authRepository.isRefreshTokenValid(user.id, refreshToken))
+      ) {
+        throw new UnauthorizedException('Invalid refresh token');
+      }
+
+      const newAccessToken = this.generateAccessToken(user);
+
+      return { accessToken: newAccessToken };
+    } catch {
+      throw new UnauthorizedException('Invalid or expired refresh token');
+    }
+  }
+
+  private generateAccessToken(user: User): string {
+    return this.jwtService.sign(
+      { sub: user.id, email: user.email },
+      { expiresIn: this.configService.get<string>('JWT_EXPIRES_IN') },
+    );
+  }
+
+  private generateRefreshToken(user: User): string {
+    return this.jwtService.sign(
+      { sub: user.id },
+      {
+        expiresIn: this.configService.get<string>('REFRESH_TOKEN_EXPIRES_IN'),
+        secret: this.configService.get<string>('REFRESH_TOKEN_SECRET'),
+      },
+    );
   }
 }

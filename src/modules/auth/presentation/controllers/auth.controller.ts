@@ -12,6 +12,7 @@ import {
 import { AuthService } from '../../application/services/auth.service';
 import { LoginDto } from '../../application/dtos/login.dto';
 import { RegisterDto } from '../../application/dtos/register.dto';
+import { RefreshTokenDto } from '../../application/dtos/refresh-token.dto';
 import { JwtAuthGuard } from '../../infrastructure/guards/jwt-auth.guard';
 import { User } from '../../infrastructure/decorators/user.decorator';
 import { PublicUserDto } from '../../application/dtos/public-user.dto';
@@ -52,15 +53,28 @@ export class AuthController {
     }
   }
 
-  // @Get('profile')
-  // @UseGuards(JwtAuthGuard)
-  // getProfile(@Request() req: { user: any }): any {
-  //   return req.user;
-  // }
-
   @UseGuards(JwtAuthGuard)
-  @Get('me')
+  @Get('profile')
   getMe(@User() user: PublicUserDto) {
     return user;
+  }
+
+  @Post('refresh')
+  async refresh(@Body(ValidationPipe) refreshTokenDto: RefreshTokenDto) {
+    try {
+      return await this.authService.refreshToken(refreshTokenDto.refreshToken);
+    } catch (error) {
+      const errorMessage = (error as Error).message;
+      if (
+        errorMessage === 'Invalid refresh token' ||
+        errorMessage === 'User not found'
+      ) {
+        throw new HttpException(errorMessage, HttpStatus.UNAUTHORIZED);
+      }
+      throw new HttpException(
+        'Error refreshing token',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 }

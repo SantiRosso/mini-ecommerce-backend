@@ -6,6 +6,7 @@ export class User {
     public readonly password?: string,
     public readonly createdAt?: Date,
     public readonly updatedAt?: Date,
+    public readonly refreshToken?: string,
   ) {}
 
   static create(email: string, name: string, password: string): User {
@@ -23,6 +24,7 @@ export class User {
       this.password,
       this.createdAt,
       new Date(),
+      this.refreshToken,
     );
   }
 
@@ -34,6 +36,7 @@ export class User {
       this.password,
       this.createdAt,
       new Date(),
+      this.refreshToken,
     );
   }
 
@@ -45,6 +48,19 @@ export class User {
       newPassword,
       this.createdAt,
       new Date(),
+      this.refreshToken,
+    );
+  }
+
+  updateRefreshToken(newRefreshToken?: string): User {
+    return new User(
+      this.id,
+      this.email,
+      this.name,
+      this.password,
+      this.createdAt,
+      new Date(),
+      newRefreshToken,
     );
   }
 
