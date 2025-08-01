@@ -13,6 +13,12 @@ async function bootstrap() {
       transform: true,
     }),
   );
+  // Configurar CORS
+  app.enableCors({
+    origin: '*',
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    // credentials: true,
+  });
 
   const port = process.env.PORT || 3000;
   await app.listen(port);
