@@ -15,7 +15,10 @@ export class UserEntity {
   email: string;
 
   @Column()
-  name: string;
+  firstName: string;
+
+  @Column()
+  lastName: string;
 
   @Column({ select: false }) // No incluir password por defecto en las consultas
   password: string;

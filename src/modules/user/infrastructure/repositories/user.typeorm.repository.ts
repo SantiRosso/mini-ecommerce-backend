@@ -50,7 +50,8 @@ export class UserTypeOrmRepository implements UserRepository {
     return new User(
       userEntity.id,
       userEntity.email,
-      userEntity.name,
+      userEntity.firstName,
+      userEntity.lastName,
       undefined, // No incluir password por defecto
       userEntity.createdAt,
       userEntity.updatedAt,
@@ -61,7 +62,8 @@ export class UserTypeOrmRepository implements UserRepository {
     const entity = new UserEntity();
     entity.id = user.id;
     entity.email = user.email;
-    entity.name = user.name;
+    entity.firstName = user.firstName;
+    entity.lastName = user.lastName;
     entity.password = user.password || '';
     entity.createdAt = user.createdAt || new Date();
     entity.updatedAt = user.updatedAt || new Date();

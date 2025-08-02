@@ -39,7 +39,8 @@ export class UserService {
 
     const user = User.create(
       createUserDto.email,
-      createUserDto.name,
+      createUserDto.firstName,
+      createUserDto.lastName,
       hashedPassword,
     );
     return this.userRepository.create(user);

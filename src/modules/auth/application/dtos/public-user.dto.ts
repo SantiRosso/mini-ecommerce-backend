@@ -8,5 +8,8 @@ export class PublicUserDto {
   email: string;
 
   @IsString()
-  name: string;
+  firstName: string;
+
+  @IsString()
+  lastName: string;
 }

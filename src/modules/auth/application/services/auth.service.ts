@@ -34,7 +34,8 @@ export class AuthService {
     // Crear usuario
     const user = User.create(
       registerDto.email,
-      registerDto.name,
+      registerDto.firstName,
+      registerDto.lastName,
       hashedPassword,
     );
     const savedUser = await this.authRepository.createUser(user);

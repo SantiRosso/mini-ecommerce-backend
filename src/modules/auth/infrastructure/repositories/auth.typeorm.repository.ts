@@ -25,7 +25,15 @@ export class AuthTypeOrmRepository implements AuthRepository {
   async findUserByEmailWithPassword(email: string): Promise<User | null> {
     const userEntity = await this.userRepository.findOne({
       where: { email },
-      select: ['id', 'email', 'name', 'password', 'createdAt', 'updatedAt'],
+      select: [
+        'id',
+        'email',
+        'firstName',
+        'lastName',
+        'password',
+        'createdAt',
+        'updatedAt',
+      ],
     });
     return userEntity ? this.toDomainWithPassword(userEntity) : null;
   }
@@ -40,7 +48,8 @@ export class AuthTypeOrmRepository implements AuthRepository {
     return new User(
       userEntity.id,
       userEntity.email,
-      userEntity.name,
+      userEntity.firstName,
+      userEntity.lastName,
       undefined, // No incluir password por defecto
       userEntity.createdAt,
       userEntity.updatedAt,
@@ -52,8 +61,9 @@ export class AuthTypeOrmRepository implements AuthRepository {
     return new User(
       userEntity.id,
       userEntity.email,
-      userEntity.name,
-      userEntity.password,
+      userEntity.firstName,
+      userEntity.lastName,
+      undefined, // No incluir password por defecto
       userEntity.createdAt,
       userEntity.updatedAt,
       userEntity.refreshToken,
@@ -64,7 +74,8 @@ export class AuthTypeOrmRepository implements AuthRepository {
     const entity = new UserEntity();
     entity.id = user.id;
     entity.email = user.email;
-    entity.name = user.name;
+    entity.firstName = user.firstName;
+    entity.lastName = user.lastName;
     if (!user.password) {
       throw new Error('Password is required when creating a user entity');
     }

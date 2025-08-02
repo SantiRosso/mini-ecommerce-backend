@@ -2,25 +2,32 @@ export class User {
   constructor(
     public readonly id: string,
     public readonly email: string,
-    public readonly name: string,
+    public readonly firstName: string,
+    public readonly lastName: string,
     public readonly password?: string,
     public readonly createdAt?: Date,
     public readonly updatedAt?: Date,
     public readonly refreshToken?: string,
   ) {}
 
-  static create(email: string, name: string, password: string): User {
+  static create(
+    email: string,
+    firstName: string,
+    lastName: string,
+    password: string,
+  ): User {
     const now = new Date();
     const id = crypto.randomUUID();
 
-    return new User(id, email, name, password, now, now);
+    return new User(id, email, firstName, lastName, password, now, now);
   }
 
-  updateName(newName: string): User {
+  updateName(firstName: string, lastName: string): User {
     return new User(
       this.id,
       this.email,
-      newName,
+      firstName,
+      lastName,
       this.password,
       this.createdAt,
       new Date(),
@@ -32,7 +39,8 @@ export class User {
     return new User(
       this.id,
       newEmail,
-      this.name,
+      this.firstName,
+      this.lastName,
       this.password,
       this.createdAt,
       new Date(),
@@ -44,7 +52,8 @@ export class User {
     return new User(
       this.id,
       this.email,
-      this.name,
+      this.firstName,
+      this.lastName,
       newPassword,
       this.createdAt,
       new Date(),
@@ -56,7 +65,8 @@ export class User {
     return new User(
       this.id,
       this.email,
-      this.name,
+      this.firstName,
+      this.lastName,
       this.password,
       this.createdAt,
       new Date(),
@@ -68,14 +78,16 @@ export class User {
   toPublic(): {
     id: string;
     email: string;
-    name: string;
+    firstName: string;
+    lastName: string;
     createdAt?: Date;
     updatedAt?: Date;
   } {
     return {
       id: this.id,
       email: this.email,
-      name: this.name,
+      firstName: this.firstName,
+      lastName: this.lastName,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt,
     };
