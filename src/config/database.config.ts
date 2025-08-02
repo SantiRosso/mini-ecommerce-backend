@@ -10,7 +10,8 @@ export const typeOrmConfig: TypeOrmModuleOptions = {
   database: process.env.DB_NAME || 'mini_ecommerce',
   entities: [UserEntity],
   synchronize: process.env.NODE_ENV !== 'production', // Solo en desarrollo
-  logging: process.env.NODE_ENV === 'development',
+  // logging: process.env.NODE_ENV === 'development',
+  logging: false,
   timezone: 'Z',
   charset: 'utf8mb4',
 };
