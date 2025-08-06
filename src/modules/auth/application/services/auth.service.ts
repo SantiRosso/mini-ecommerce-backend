@@ -57,7 +57,9 @@ export class AuthService {
     loginDto: LoginDto,
   ): Promise<{ user: any; accessToken: string; refreshToken: string }> {
     // Buscar usuario con contraseña
-    const user = await this.authRepository.findUserByEmail(loginDto.email);
+    const user = await this.authRepository.findUserByEmailWithPassword(
+      loginDto.email,
+    );
     console.log('Hola', user);
     if (!user) {
       throw new UnauthorizedException('Invalid credentials');

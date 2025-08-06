@@ -63,7 +63,7 @@ export class AuthTypeOrmRepository implements AuthRepository {
       userEntity.email,
       userEntity.firstName,
       userEntity.lastName,
-      undefined, // No incluir password por defecto
+      userEntity.password,
       userEntity.createdAt,
       userEntity.updatedAt,
       userEntity.refreshToken,
