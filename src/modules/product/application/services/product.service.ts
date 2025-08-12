@@ -1,12 +1,16 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject } from '@nestjs/common';
 import { ProductRepository } from '../../domain/repositories/product.repository';
 import { Product } from '../../domain/entities/product.entity';
 import { CreateProductDto } from '../dtos/create-product.dto';
 import { UpdateProductDto } from '../dtos/update-product.dto';
+import { PRODUCT_REPOSITORY_TOKEN } from '../../domain/repositories/product.repository.token';
 
 @Injectable()
 export class ProductService {
-  constructor(private readonly productRepository: ProductRepository) {}
+  constructor(
+    @Inject(PRODUCT_REPOSITORY_TOKEN)
+    private readonly productRepository: ProductRepository,
+  ) {}
 
   findAll(): Promise<Product[]> {
     return this.productRepository.findAll();

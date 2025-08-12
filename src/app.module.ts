@@ -6,6 +6,8 @@ import { UserModule } from './modules/user/user.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { FavoriteModule } from './modules/favorite/favorite.module';
 import { FavoriteEntity } from './modules/favorite/infrastructure/entities/favorite.typeorm.entity';
+import { ProductModule } from './modules/product/presentation/product.module';
+import { ProductEntity } from './modules/product/infrastructure/entities/product.typeorm.entity';
 
 @Module({
   imports: [
@@ -22,7 +24,7 @@ import { FavoriteEntity } from './modules/favorite/infrastructure/entities/favor
         username: configService.get('DB_USERNAME', 'root'),
         password: configService.get('DB_PASSWORD', ''),
         database: configService.get('DB_NAME', 'mini_ecommerce'),
-        entities: [UserEntity, FavoriteEntity],
+        entities: [UserEntity, FavoriteEntity, ProductEntity],
         synchronize: configService.get('NODE_ENV') !== 'production',
         // logging: configService.get('NODE_ENV') === 'development',
         logging: false,
@@ -33,6 +35,7 @@ import { FavoriteEntity } from './modules/favorite/infrastructure/entities/favor
     }),
     UserModule,
     AuthModule,
+    ProductModule,
     FavoriteModule,
   ],
   controllers: [],
