@@ -60,7 +60,6 @@ export class AuthService {
     const user = await this.authRepository.findUserByEmailWithPassword(
       loginDto.email,
     );
-    console.log('Hola', user);
     if (!user) {
       throw new UnauthorizedException('Invalid credentials');
     }
@@ -91,12 +90,6 @@ export class AuthService {
 
   async refreshToken(refreshToken: string): Promise<{ accessToken: string }> {
     try {
-      // interface JwtPayload {
-      //   sub: string;
-      //   iat?: number;
-      //   exp?: number;
-      // }
-
       const payload = this.jwtService.verify(refreshToken, {
         secret: this.configService.get<string>('REFRESH_TOKEN_SECRET'),
       });
