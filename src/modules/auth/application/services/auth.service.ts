@@ -17,9 +17,12 @@ export class AuthService {
     private readonly configService: ConfigService,
   ) {}
 
-  async register(
-    registerDto: RegisterDto,
-  ): Promise<{ user: any; accesshToken: string; refreshToken: string }> {
+  async register(registerDto: RegisterDto): Promise<{
+    user: any;
+    accessToken: string;
+    refreshToken: string;
+    expiresIn: number;
+  }> {
     // Verificar si el usuario ya existe
     const existingUser = await this.authRepository.findUserByEmail(
       registerDto.email,
@@ -41,21 +44,32 @@ export class AuthService {
     const savedUser = await this.authRepository.createUser(user);
 
     // Generar token
-    const accesshToken = this.generateAccessToken(savedUser);
+    const accessToken = this.generateAccessToken(savedUser);
     const refreshToken = this.generateRefreshToken(savedUser);
 
     await this.authRepository.saveRefreshToken(savedUser.id, refreshToken);
 
+    const expiresIn =
+      parseInt(
+        this.configService
+          .get<string>('JWT_EXPIRES_IN', '24h')
+          .replace('h', ''),
+      ) * 3600;
+
     return {
       user: savedUser.toPublic(),
-      accesshToken,
+      accessToken,
       refreshToken,
+      expiresIn,
     };
   }
 
-  async login(
-    loginDto: LoginDto,
-  ): Promise<{ user: any; accessToken: string; refreshToken: string }> {
+  async login(loginDto: LoginDto): Promise<{
+    user: any;
+    accessToken: string;
+    refreshToken: string;
+    expiresIn: number;
+  }> {
     // Buscar usuario con contraseña
     const user = await this.authRepository.findUserByEmailWithPassword(
       loginDto.email,
@@ -77,10 +91,18 @@ export class AuthService {
     const accessToken = this.generateAccessToken(user);
     const refreshToken = this.generateRefreshToken(user);
 
+    const expiresIn =
+      parseInt(
+        this.configService
+          .get<string>('JWT_EXPIRES_IN', '24h')
+          .replace('h', ''),
+      ) * 3600;
+
     return {
       user: user.toPublic(),
       accessToken,
       refreshToken,
+      expiresIn,
     };
   }
 
