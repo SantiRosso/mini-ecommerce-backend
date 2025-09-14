@@ -1,7 +1,9 @@
+import { FavoriteEntity } from 'src/modules/favorite/infrastructure/entities/favorite.typeorm.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -31,4 +33,9 @@ export class UserEntity {
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @OneToMany(() => FavoriteEntity, (favorite) => favorite.user, {
+    cascade: true, // Cuando se elimina el usuario, se eliminan sus favoritos
+  })
+  favorites?: FavoriteEntity[];
 }

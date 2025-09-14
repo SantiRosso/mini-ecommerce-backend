@@ -1,3 +1,5 @@
+import { ProductEntity } from 'src/modules/product/infrastructure/entities/product.typeorm.entity';
+import { UserEntity } from 'src/modules/user/infrastructure/entities/user.typeorm.entity';
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -5,6 +7,8 @@ import {
   CreateDateColumn,
   Unique,
   Index,
+  ManyToOne,
+  JoinColumn,
 } from 'typeorm';
 
 @Entity('favorites')
@@ -23,4 +27,12 @@ export class FavoriteEntity {
 
   @CreateDateColumn()
   createdAt: Date;
+
+  @ManyToOne(() => ProductEntity, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'productId' })
+  product: ProductEntity;
+
+  @ManyToOne(() => UserEntity, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'userId' })
+  user: UserEntity;
 }
